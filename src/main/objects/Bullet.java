@@ -55,8 +55,12 @@ public class Bullet extends MovingGameObjects {
     public void collision() {
         for(int i = 0; i < handler.getHandler().size(); i++){
             GameObject tempObj = handler.getHandler().get(i);
-            if(tempObj.getId().equals(ObjectID.Enemy) && this.id.equals(ObjectID.PlayerBullet)){
+            if(((tempObj.getId().equals(ObjectID.Enemy)) || (tempObj.getId().equals(ObjectID.EnemyBoss))) && this.id.equals(ObjectID.PlayerBullet)){
                 if(this.getCollisionBounds().intersects(tempObj.getCollisionBounds())){
+                    if(tempObj.getId().equals(ObjectID.EnemyBoss)){
+                        Cat cat = (Cat) tempObj;
+                        cat.setHurting(true);
+                    }
                     Player.setBulletsHit(Player.getBulletsHit() + 1);
                     this.dealDamage(tempObj);
                     handler.removeObject(this);
@@ -72,7 +76,7 @@ public class Bullet extends MovingGameObjects {
     }
 
     public void dealDamage(GameObject obj){
-        if(obj.getId().equals(ObjectID.Enemy)){
+        if(obj.getId().equals(ObjectID.Enemy) || obj.getId().equals(ObjectID.EnemyBoss)){
             Enemy temp = (Enemy) obj;
             temp.setHealth(temp.getHealth() - damage);
             temp.isDead();
@@ -81,6 +85,9 @@ public class Bullet extends MovingGameObjects {
             Player temp = (Player) obj;
             if(!temp.getInvincible()){
                 temp.setInvincible(true);
+                temp.getHurtLeft().setIndex(0);
+                temp.getHurtRight().setIndex(0);
+                temp.setHurting(true);
                 temp.setHealth(temp.getHealth() - damage);
                 temp.isDead();
             }

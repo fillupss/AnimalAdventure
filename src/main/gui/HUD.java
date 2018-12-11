@@ -41,7 +41,7 @@ public class HUD {
         if(p.getLifeLeft() == -1 || levelLoader.getLevel() == 4){
             handler.removeAll();
             g.setFont(new Font("arial",1,36));
-            g.setColor(Color.WHITE);
+            g.setColor(Color.BLACK);
             g.drawString("Game Over!!", GameWorld.WIDTH/8 * 3, GameWorld.HEIGHT/4);
             g.setFont(new Font("arial",1,18));
             g.drawString("Player score: " + scoreP1, GameWorld.WIDTH/4, GameWorld.HEIGHT/2);
@@ -51,7 +51,7 @@ public class HUD {
             for(int i = 1; i < p.getLifeLeft() + 1; i++){
                 g.setColor(Color.black);
                 g.drawString("Revives Left:",0,16);
-                g.drawImage(images.dogPlayer[30], 22 * i + 64, 2, 22,32, null);
+                g.drawImage(images.dogPlayer[28], 22 * i + 64, 2, 22,32, null);
             }
 
             // display health left
@@ -66,6 +66,19 @@ public class HUD {
             g.drawString("Score: " + scoreP1, GameWorld.WIDTH/16,GameWorld.HEIGHT-32);
             g.drawString("Bullet count: " + p.getCount() + "/" + p.getTotalCount(),
                     GameWorld.WIDTH/2, GameWorld.HEIGHT - 32);
+
+            // display the type of bullet that is being used from the player
+            if(p.getTotalCount() == 5){
+                g.drawImage(images.playerBullet[0],GameWorld.WIDTH/2 - 30,GameWorld.HEIGHT - 35, null);
+                g.drawImage(images.playerBullet[0],GameWorld.WIDTH/2 - 30,GameWorld.HEIGHT - 52, null);
+            }
+            else if(p.getTotalCount() == 2){
+                g.drawImage(images.playerBullet[1], GameWorld.WIDTH/2 - 30,GameWorld.HEIGHT - 50,
+                        images.playerBullet[1].getWidth()/2,images.playerBullet[1].getHeight()/2,null);
+            }
+            else{
+                g.drawImage(images.playerBullet[0], GameWorld.WIDTH/2 - 30,GameWorld.HEIGHT - 40,null);
+            }
         }
     }
 }

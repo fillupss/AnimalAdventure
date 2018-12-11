@@ -1,14 +1,28 @@
 package main.objects;
 
+import main.brain.Animation;
 import main.brain.Controller;
 import main.brain.LevelLoader;
 import main.brain.ObjectID;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Player extends MovingGameObjects {
 
+    private Animation walkRight, walkLeft, jumpRight, jumpLeft, hurtRight, hurtLeft, deadRight, deadLeft;
+    private BufferedImage[] rightWalk = new BufferedImage[8];
+    private BufferedImage[] leftWalk = new BufferedImage[8];
+    private BufferedImage[] rightJump = new BufferedImage[6];
+    private BufferedImage[] leftJump = new BufferedImage[6];
+    private BufferedImage[] rightHurt = new BufferedImage[8];
+    private BufferedImage[] leftHurt = new BufferedImage[8];
+    private BufferedImage[] rightDead = new BufferedImage[6];
+    private BufferedImage[] leftDead = new BufferedImage[6];
+
+
     private LevelLoader levelLoader;
+    private boolean isHurting = false, isDead = false;
     private boolean isJumping = false, isFalling = false;
     private boolean faceDirection; // false -> right, true -> left
 
@@ -16,7 +30,7 @@ public class Player extends MovingGameObjects {
     private boolean missilePowerUp = false; // 2 shots
 
     private boolean isInvincible = false;
-    private int maxTime = 75;
+    private int maxTime = 125;
     private int currentTime = 0;
     private int life = 2;
     private int count = 0; // used to know how many shots are left in the power up
@@ -30,7 +44,32 @@ public class Player extends MovingGameObjects {
     public Player(float x, float y, ObjectID id, Controller handler, LevelLoader levelLoader) {
         super(x, y, id, handler);
         this.levelLoader = levelLoader;
-        this.idleImage = images.dogPlayer[30];
+        this.idleImage = images.dogPlayer[28];
+
+        // setting up all the animations for the dog
+        for(int i = 0; i < 8; i++){
+            rightWalk[i] = images.dogPlayer[i+42];
+            leftWalk[i] = images.dogPlayer[i+50];
+            rightHurt[i] = images.dogPlayer[i+12];
+            leftHurt[i] = images.dogPlayer[i+20];
+        }
+        for(int i = 0; i < 6; i++){
+            rightDead[i] = images.dogPlayer[i];
+            leftDead[i] = images.dogPlayer[i+6];
+            rightJump[i] = images.dogPlayer[i+30];
+            leftJump[i] = images.dogPlayer[i+36];
+        }
+
+        walkRight = new Animation(100,rightWalk);
+        walkLeft = new Animation(100,leftWalk);
+        jumpRight = new Animation(200,rightJump);
+        jumpLeft = new Animation(200,leftJump);
+        hurtLeft = new Animation(100,leftHurt);
+        hurtRight = new Animation(100,rightHurt);
+        deadLeft = new Animation(500,leftDead);
+        deadRight = new Animation(500,rightDead);
+
+
         faceDirection = false;
         health = 3;
 
@@ -38,8 +77,20 @@ public class Player extends MovingGameObjects {
 
     @Override
     public void tick() {
+
         x += velX;
         y += velY;
+
+
+        // the animations
+        walkLeft.tick();
+        walkRight.tick();
+        jumpLeft.tick();
+        jumpRight.tick();
+        hurtLeft.tick();
+        hurtRight.tick();
+        deadLeft.tick();
+        deadRight.tick();
 
         if(isInvincible && currentTime == maxTime){
             currentTime = 0;
@@ -111,15 +162,49 @@ public class Player extends MovingGameObjects {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.red);
+        //g.setColor(Color.red);
         //g.drawRect((int)x, (int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE));
         //g.drawRect((int)x,(int)y,(int)(this.idleImage.getWidth()/SCALE), 3);
         //g.drawRect((int)(x + this.idleImage.getWidth()/SCALE - 3), (int)y,3,(int)(this.idleImage.getHeight()/SCALE));
         //g.drawRect((int)x, (int)y,3,(int)(this.idleImage.getHeight()/SCALE));
-        if(!faceDirection)
-            g.drawImage(idleImage,(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
-        else
-            g.drawImage(images.dogPlayer[31],(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+        if(isDead){
+            isInvincible = true;
+            currentTime = 0;
+            if(!faceDirection)
+                g.drawImage(deadRight.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            else
+                g.drawImage(deadLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            if((deadRight.getIndex() == rightDead.length -1) || (deadLeft.getIndex() == leftDead.length -1)){
+                this.isDead = false;
+            }
+        }
+        else if(isHurting){
+            if(!faceDirection)
+                g.drawImage(hurtRight.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            else
+                g.drawImage(hurtLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            if((hurtRight.getIndex() == rightHurt.length -1) || (hurtLeft.getIndex() == leftHurt.length -1)){
+                this.isHurting = false;
+            }
+        }
+        else if(isJumping){
+            if(!faceDirection)
+                g.drawImage(jumpRight.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            else
+                g.drawImage(jumpLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+        }
+        else if(velX != 0){
+            if(!faceDirection)
+                g.drawImage(walkRight.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            else
+                g.drawImage(walkLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+        }
+        else{
+            if(!faceDirection)
+                g.drawImage(idleImage,(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            else
+                g.drawImage(images.dogPlayer[29],(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+        }
     }
 
     public Rectangle getTopCollisionBounds(){
@@ -138,9 +223,9 @@ public class Player extends MovingGameObjects {
     public void shoot() {
         if(missilePowerUp && count > 0){
             if(faceDirection)
-                handler.addObject(new BulletBill(this.x, this.y + idleImage.getHeight()/SCALE/2, ObjectID.PlayerBullet, handler, faceDirection));
+                handler.addObject(new BulletBill(this.x, this.y + idleImage.getHeight()/SCALE/2 - 10, ObjectID.PlayerBullet, handler, faceDirection));
             else
-                handler.addObject(new BulletBill(this.x + idleImage.getWidth()/2, this.y + idleImage.getHeight()/SCALE/2, ObjectID.PlayerBullet, handler, faceDirection));
+                handler.addObject(new BulletBill(this.x + idleImage.getWidth()/2, this.y + idleImage.getHeight()/SCALE/2 - 10, ObjectID.PlayerBullet, handler, faceDirection));
             count--;
         }
         else if(doubleShotPowerUp && count > 0){
@@ -172,6 +257,9 @@ public class Player extends MovingGameObjects {
     @Override
     public void isDead() {
         if(health <= 0){
+            isDead = true;
+            this.resetDeathAnimation();
+            isHurting = false;
             if(life >= 0){
                 if(life == 0){
                     this.health = 0;
@@ -244,6 +332,22 @@ public class Player extends MovingGameObjects {
 
     public static int getFinalHit(){
         return finalHit;
+    }
+
+    public void setHurting(boolean isHurting){
+        this.isHurting = isHurting;
+    }
+
+    public Animation getHurtRight(){
+        return hurtRight;
+    }
+    public Animation getHurtLeft(){
+        return hurtLeft;
+    }
+
+    private void resetDeathAnimation(){
+        this.deadRight.setIndex(0);
+        this.deadLeft.setIndex(0);
     }
 
 }

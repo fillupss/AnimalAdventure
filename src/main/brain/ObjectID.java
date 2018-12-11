@@ -8,5 +8,6 @@ public enum ObjectID {
     Enemy(),
     EnemyBullet(),
     PlayerBullet(),
-    SandBlock()
+    SandBlock(),
+    EnemyBoss()
 }

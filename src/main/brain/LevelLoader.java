@@ -91,7 +91,7 @@ public class LevelLoader {
 
                 // check if the pixel is purple
                 else if(red == 178 && green == 0 && blue == 255){
-                    handler.addObject(new Cat(xx*32,yy*32,ObjectID.Enemy,handler));
+                    handler.addObject(new Cat(xx*32,yy*32,ObjectID.EnemyBoss,handler));
                 }
             }
         }

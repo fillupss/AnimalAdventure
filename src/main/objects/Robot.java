@@ -1,13 +1,20 @@
 package main.objects;
 
+import main.brain.Animation;
 import main.brain.Controller;
 import main.brain.ObjectID;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Robot extends Enemy {
 
+    private Animation shootLeft;
+    private BufferedImage[] leftAttack = new BufferedImage[8];
+    private BufferedImage[] leftShoot = new BufferedImage[4];
+
     private boolean faceDirection = true; // false -> right, true -> left
+    private boolean isShooting = false;
     private int rateOfFire, counter;
 
     public Robot(float x, float y, ObjectID id, Controller handler) {
@@ -17,19 +24,46 @@ public class Robot extends Enemy {
         idleImage = images.robot[1];
         rateOfFire = 150;
         counter = 0;
+
+        for(int i = 0; i < 8; i++){
+            leftAttack[i] = images.robot[i+2];
+        }
+        for(int i = 0; i < 4; i++){
+            leftShoot[i] = images.robot[i+10];
+        }
+
+        attackLeft = new Animation(200,leftAttack);
+        shootLeft = new Animation(200,leftShoot);
     }
 
     @Override
     public void tick() {
         x += 0;
         y += 0;
+        attackLeft.tick();
+        shootLeft.tick();
         collision();
         shoot();
     }
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(idleImage,(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+        // adding this shooting animation led to a crash sometimes
+        if(isShooting){
+            g.drawImage(shootLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            if(shootLeft.getIndex() == leftShoot.length -1){
+                this.isShooting = false;
+                handler.addObject(new BlastBullet(x - 20,y + idleImage.getHeight()/2 - 30,ObjectID.EnemyBullet,handler, faceDirection));
+            }
+        }
+        else if(isAttacking){
+            g.drawImage(attackLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
+            if(attackLeft.getIndex() == leftAttack.length -1){
+                this.isAttacking = false;
+            }
+        }
+        else
+            g.drawImage(idleImage,(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
 
         // display health bar above the enemy
         g.setColor(Color.GRAY);
@@ -44,7 +78,8 @@ public class Robot extends Enemy {
     @Override
     public void shoot() {
         if(rateOfFire == counter){
-            handler.addObject(new BlastBullet(x - 20,y + idleImage.getHeight()/2 - 30,ObjectID.EnemyBullet,handler, faceDirection));
+            isShooting = true;
+            resetShootAnimation();
             counter = 0;
         }
         else{
@@ -56,6 +91,10 @@ public class Robot extends Enemy {
     @Override
     public void isDead() {
         super.isDead();
+    }
+
+    private void resetShootAnimation(){
+        this.shootLeft.setIndex(0);
     }
 
 }

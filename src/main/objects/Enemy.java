@@ -1,5 +1,6 @@
 package main.objects;
 
+import main.brain.Animation;
 import main.brain.Controller;
 import main.brain.ObjectID;
 
@@ -7,6 +8,9 @@ import java.awt.*;
 
 public abstract class Enemy extends MovingGameObjects {
 
+    protected Animation attackRight, attackLeft;
+
+    protected boolean isAttacking = false;
     protected int currentDistance;
     protected int maxDistance; // once it traveled this much distance reverse its direction
     private int damage;
@@ -28,6 +32,7 @@ public abstract class Enemy extends MovingGameObjects {
             if(temp.getId().equals(ObjectID.Player)){
                 Player p = (Player) temp;
                 if(this.getCollisionBounds().intersects(temp.getCollisionBounds())){
+                    isAttacking = true;
                     this.dealDamage(p);
                     p.setVelX(p.getvelX() * -1);
                     p.setInvincible(true);
@@ -46,12 +51,17 @@ public abstract class Enemy extends MovingGameObjects {
 
     @Override
     public void isDead() {
-        if(health <= 0)
+        if(health <= 0){
+            Player.setFinalHit(Player.getFinalHit()+1);
             handler.removeObject(this);
+        }
     }
 
     public void dealDamage(Player p){
         if(!p.getInvincible()){
+            p.getHurtLeft().setIndex(0);
+            p.getHurtRight().setIndex(0);
+            p.setHurting(true);
             p.setHealth(p.getHealth() - damage);
             p.isDead();
         }
