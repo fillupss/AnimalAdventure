@@ -102,7 +102,7 @@ public class LevelLoader {
         cam.setX(0);
         switch(level){
             case 0:
-                LoadImageLevel(images.levels[2]);
+                LoadImageLevel(images.levels[0]);
                 break;
             case 1:
                 LoadImageLevel(images.levels[1]);
