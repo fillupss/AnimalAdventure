@@ -28,20 +28,20 @@ public class KeyInput extends KeyAdapter {
             GameObject temp = hand.handler.get(i);
             if(temp.getId().equals(ObjectID.Player)){
                 Player temp1 = (Player) temp;
-                if(keyCode == KeyEvent.VK_A){
+                if(keyCode == KeyEvent.VK_A && !temp1.isHurting() && !temp1.isRespawning()){
                     temp1.setVelX(-5);
                     keyPressedP1[0] = true;
                 }
-                if(keyCode == KeyEvent.VK_D){
+                if(keyCode == KeyEvent.VK_D && !temp1.isHurting() && !temp1.isRespawning()){
                     temp1.setVelX(5);
                     keyPressedP1[1] = true;
                 }
-                if(keyCode == KeyEvent.VK_W && !temp1.getJumping()){
-                    temp1.setVelY(-12);
+                if(keyCode == KeyEvent.VK_W && !temp1.getJumping() && !temp1.isHurting() && !temp1.isRespawning()){
+                    temp1.setVelY(-13);
                     temp1.setJumping(true);
                     keyPressedP1[2] = true;
                 }
-                if(keyCode == KeyEvent.VK_SPACE && !keyPressedP1[0] && !keyPressedP1[1]){
+                if(keyCode == KeyEvent.VK_SPACE && !keyPressedP1[0] && !keyPressedP1[1] && !temp1.isHurting() && !temp1.isRespawning()){
                     if(!keyPressedP1[3]){
                         temp1.shoot();
                         keyPressedP1[3] = true;

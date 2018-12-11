@@ -134,10 +134,6 @@ public class Player extends MovingGameObjects {
                     }
                 }
 
-                if(this.getRightCollisionBounds().intersects(temp.getCollisionBounds())){
-                    x = temp.getX() - 32;
-                }
-
                 if(this.getCollisionBounds().intersects(temp.getCollisionBounds())){
                     velY = 0;
                     this.y = temp.getY() - idleImage.getHeight()/SCALE;
@@ -148,6 +144,9 @@ public class Player extends MovingGameObjects {
                 }
                 else{
                     isFalling = true;
+                }
+                if(this.getRightCollisionBounds().intersects(temp.getCollisionBounds())){
+                    x = temp.getX() - 48;
                 }
                 if(this.getLeftCollisionBounds().intersects(temp.getCollisionBounds())){
                     x = temp.getX() + 32;
@@ -162,11 +161,11 @@ public class Player extends MovingGameObjects {
 
     @Override
     public void draw(Graphics g) {
-        //g.setColor(Color.red);
-        //g.drawRect((int)x, (int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE));
-        //g.drawRect((int)x,(int)y,(int)(this.idleImage.getWidth()/SCALE), 3);
-        //g.drawRect((int)(x + this.idleImage.getWidth()/SCALE - 3), (int)y,3,(int)(this.idleImage.getHeight()/SCALE));
-        //g.drawRect((int)x, (int)y,3,(int)(this.idleImage.getHeight()/SCALE));
+        /*g.setColor(Color.red);
+        g.drawRect((int)x + 10, (int)y + 10, (int)(idleImage.getWidth()/SCALE - 20), (int)(idleImage.getHeight()/SCALE - 10)); // whole character
+        g.drawRect((int)x + 10,(int)y,(int)(this.idleImage.getWidth()/SCALE - 20), 10); // top
+        g.drawRect((int)(x + this.idleImage.getWidth()/SCALE - 10), (int)y + 10,10,(int)(this.idleImage.getHeight()/SCALE - 18)); // right
+        g.drawRect((int)x, (int)y+10,10,(int)(this.idleImage.getHeight()/SCALE - 18)); // left*/
         if(isDead){
             isInvincible = true;
             currentTime = 0;
@@ -208,15 +207,20 @@ public class Player extends MovingGameObjects {
     }
 
     public Rectangle getTopCollisionBounds(){
-        return new Rectangle((int)x,(int)y,(int)(this.idleImage.getWidth()/SCALE), 3);
+        return new Rectangle((int)x + 10,(int)y,(int)(this.idleImage.getWidth()/SCALE - 20), 10);
     }
 
     public Rectangle getRightCollisionBounds(){
-        return new Rectangle((int)(x + this.idleImage.getWidth()/SCALE)-3, (int)y,3,(int)(this.idleImage.getHeight()/SCALE));
+        return new Rectangle((int)(x + this.idleImage.getWidth()/SCALE - 10), (int)y + 10,10,(int)(this.idleImage.getHeight()/SCALE - 18));
     }
 
     public Rectangle getLeftCollisionBounds(){
-        return new Rectangle((int)x, (int)y + 3,3,(int)(this.idleImage.getHeight()/SCALE)-10);
+        return new Rectangle((int)x, (int)y+10,10,(int)(this.idleImage.getHeight()/SCALE - 18));
+    }
+
+    @Override
+    public Rectangle getCollisionBounds() {
+        return new Rectangle((int)x + 10, (int)y + 10, (int)(idleImage.getWidth()/SCALE - 20), (int)(idleImage.getHeight()/SCALE - 10));
     }
 
     @Override
@@ -336,6 +340,12 @@ public class Player extends MovingGameObjects {
 
     public void setHurting(boolean isHurting){
         this.isHurting = isHurting;
+    }
+    public boolean isHurting(){
+        return isHurting;
+    }
+    public boolean isRespawning(){
+        return isDead;
     }
 
     public Animation getHurtRight(){
