@@ -48,7 +48,6 @@ public class Robot extends Enemy {
 
     @Override
     public void draw(Graphics g) {
-        // adding this shooting animation led to a crash sometimes
         if(isShooting){
             g.drawImage(shootLeft.getCurrentFrame(),(int)x,(int)y, (int)(idleImage.getWidth()/SCALE), (int)(idleImage.getHeight()/SCALE),null);
             if(shootLeft.getIndex() == leftShoot.length -1){
