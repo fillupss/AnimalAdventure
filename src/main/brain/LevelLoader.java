@@ -121,6 +121,12 @@ public class LevelLoader {
     public int getLevel(){
         return level;
     }
+    public void setLevel(int level){
+        if(level == 0){
+            savePlayer = null;
+        }
+        this.level = level;
+    }
 
 
 }

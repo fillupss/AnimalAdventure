@@ -1,6 +1,8 @@
 package main.brain;
 
 import main.objects.GameObject;
+import main.objects.Player;
+
 import java.util.ArrayList;
 import java.awt.Graphics;
 
@@ -51,6 +53,16 @@ public class Controller {
                 i--;
             }
         }
+    }
+
+    public Player getPlayer(){
+        for (int i = 0; i < handler.size(); i++) {
+            if(handler.get(i).getId().equals(ObjectID.Player)){
+                Player p = (Player)handler.get(i);
+                return p;
+            }
+        }
+        return null;
     }
 
     public ArrayList<GameObject> getHandler(){

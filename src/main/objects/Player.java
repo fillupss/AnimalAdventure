@@ -92,6 +92,9 @@ public class Player extends MovingGameObjects {
         deadLeft.tick();
         deadRight.tick();
 
+        // isInvincible is true only when the player recently got git
+        // it is so the player can not get hit consecutively in quick successions
+        // currentTime will check if the invincibility period is over
         if(isInvincible && currentTime == maxTime){
             currentTime = 0;
             isInvincible = false;
@@ -161,11 +164,6 @@ public class Player extends MovingGameObjects {
 
     @Override
     public void draw(Graphics g) {
-        /*g.setColor(Color.red);
-        g.drawRect((int)x + 10, (int)y + 10, (int)(idleImage.getWidth()/SCALE - 20), (int)(idleImage.getHeight()/SCALE - 10)); // whole character
-        g.drawRect((int)x + 10,(int)y,(int)(this.idleImage.getWidth()/SCALE - 20), 10); // top
-        g.drawRect((int)(x + this.idleImage.getWidth()/SCALE - 10), (int)y + 10,10,(int)(this.idleImage.getHeight()/SCALE - 18)); // right
-        g.drawRect((int)x, (int)y+10,10,(int)(this.idleImage.getHeight()/SCALE - 18)); // left*/
         if(isDead){
             isInvincible = true;
             currentTime = 0;
@@ -206,18 +204,22 @@ public class Player extends MovingGameObjects {
         }
     }
 
+    // used for collision with bottom of block
     public Rectangle getTopCollisionBounds(){
         return new Rectangle((int)x + 10,(int)y,(int)(this.idleImage.getWidth()/SCALE - 20), 10);
     }
 
+    // used for collision with block
     public Rectangle getRightCollisionBounds(){
         return new Rectangle((int)(x + this.idleImage.getWidth()/SCALE - 10), (int)y + 10,10,(int)(this.idleImage.getHeight()/SCALE - 18));
     }
 
+    // used for collision with block
     public Rectangle getLeftCollisionBounds(){
         return new Rectangle((int)x, (int)y+10,10,(int)(this.idleImage.getHeight()/SCALE - 18));
     }
 
+    // used for collision with block falling or jumping
     @Override
     public Rectangle getCollisionBounds() {
         return new Rectangle((int)x + 10, (int)y + 10, (int)(idleImage.getWidth()/SCALE - 20), (int)(idleImage.getHeight()/SCALE - 10));
@@ -355,6 +357,8 @@ public class Player extends MovingGameObjects {
         return hurtLeft;
     }
 
+    // reset animation is just to see the full animation
+    // sometimes the index wouldnt start at 0 when animation is to be triggered
     private void resetDeathAnimation(){
         this.deadRight.setIndex(0);
         this.deadLeft.setIndex(0);

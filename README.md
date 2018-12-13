@@ -1,5 +1,5 @@
-# csc413-SecondGame
+# csc413-SecondGame (AnimalAdventure)
 
-## Student Name :
-## Student ID :
+## Student Name : Philip Chen
+## Student ID : 916263691
 

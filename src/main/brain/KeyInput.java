@@ -1,5 +1,6 @@
 package main.brain;
 
+import main.GameWorld;
 import main.objects.GameObject;
 import main.objects.Player;
 
@@ -9,12 +10,16 @@ import java.awt.event.KeyEvent;
 public class KeyInput extends KeyAdapter {
     // going to be used to access objects that are player
     private Controller hand;
+    private GameWorld game;
 
     // left, right, jump, Shoot
     boolean[] keyPressedP1 = new boolean[4];
+    boolean keyP = false;
 
-    public KeyInput(Controller handler){
+    public KeyInput(Controller handler, GameWorld game){
+
         this.hand = handler;
+        this.game = game;
     }
     @Override
     public void keyPressed(KeyEvent e) {
@@ -22,6 +27,10 @@ public class KeyInput extends KeyAdapter {
 
         if(keyCode == KeyEvent.VK_ESCAPE){
             System.exit(1);
+        }
+        if(keyCode == KeyEvent.VK_P && !keyP){
+            game.setPaused(!game.isPaused());
+            keyP = true;
         }
 
         for(int i = 0; i < this.hand.handler.size(); i++){
@@ -54,6 +63,9 @@ public class KeyInput extends KeyAdapter {
 
     public void keyReleased(KeyEvent e){
         int keyCode = e.getKeyCode();
+        if(keyCode == KeyEvent.VK_P){
+            keyP = false;
+        }
         for(int i = 0; i < this.hand.handler.size(); i++){
             GameObject temp = hand.handler.get(i);
             if(temp.getId().equals(ObjectID.Player)){

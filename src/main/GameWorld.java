@@ -2,6 +2,7 @@ package main;
 
 import main.brain.*;
 import main.gui.HUD;
+import main.gui.Menu;
 import main.gui.Window;
 import main.gui.MiniMap;
 import main.objects.Images;
@@ -19,6 +20,7 @@ public class GameWorld extends Canvas implements Runnable {
     private BufferedImage rainy = null;
     private Thread thread;
     private boolean running = false;
+    private boolean paused = false;
     static private Images images;
     private Controller handler;
     private Camera cam;
@@ -26,6 +28,7 @@ public class GameWorld extends Canvas implements Runnable {
     private LevelLoader levelLoader;
     private HUD hud;
     private MiniMap minimap;
+    private Menu menu;
 
     public GameWorld(){
         new Window(WIDTH, HEIGHT, "Animal Adventure", this);
@@ -36,13 +39,16 @@ public class GameWorld extends Canvas implements Runnable {
 
     images = new Images();
     handler = new Controller();
-    this.addKeyListener(new KeyInput(handler));
+    this.addKeyListener(new KeyInput(handler, this));
     cam = new Camera(0,0);
     minimapCam = new MinimapCamera(GameWorld.WIDTH - WIDTH,0);
     levelLoader = new LevelLoader(handler, cam);
     levelLoader.switchLevel();
     hud = new HUD(handler, levelLoader);
     minimap = new MiniMap(handler, levelLoader);
+    menu = new Menu(this, handler, levelLoader, hud);
+    this.addMouseListener(menu);
+    MusicPlayer.playMusic();
 
     clouds = images.cloud;
     icyMountains = images.iceMountain;
@@ -102,14 +108,16 @@ public class GameWorld extends Canvas implements Runnable {
 
     public void tick(){
 
-        handler.tick();
-        for(int i = 0; i < handler.getHandler().size(); i++){
-            if(handler.getHandler().get(i).getId().equals(ObjectID.Player)){
-                cam.tick(handler.getHandler().get(i));
-                minimapCam.tick(handler.getHandler().get(i));
+        if(!paused){
+            handler.tick();
+            for(int i = 0; i < handler.getHandler().size(); i++){
+                if(handler.getHandler().get(i).getId().equals(ObjectID.Player)){
+                    cam.tick(handler.getHandler().get(i));
+                    minimapCam.tick(handler.getHandler().get(i));
+                }
             }
+            hud.tick();
         }
-        hud.tick();
     }
 
     public void draw(){
@@ -120,42 +128,60 @@ public class GameWorld extends Canvas implements Runnable {
         }
         Graphics g = bs.getDrawGraphics();
 
-        minimap.drawFrame(g);
-        g.translate((int)minimapCam.getX(), (int)minimapCam.getY());
-        minimap.drawObjects(g);
-        g.translate((int)minimapCam.getX() * -1, (int)minimapCam.getY() * -1);
+        // check if the game is paused
+        // if not then run through the objects and minimap in the game
+        if(!paused){
+            minimap.drawFrame(g);
+            g.translate((int)minimapCam.getX(), (int)minimapCam.getY());
+            minimap.drawObjects(g);
+            g.translate((int)minimapCam.getX() * -1, (int)minimapCam.getY() * -1);
 
-        if(levelLoader.getLevel() == 1){
-            g.setColor(Color.cyan);
-            g.fillRect(0,0, MiniMap.X, HEIGHT);
-            g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
-            g.drawImage(clouds,50,50, clouds.getWidth()/2,clouds.getHeight()/2,null);
+            if(levelLoader.getLevel() == 1){
+                g.setColor(Color.cyan);
+                g.fillRect(0,0, MiniMap.X, HEIGHT);
+                g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
+                g.drawImage(clouds,50,50, clouds.getWidth()/2,clouds.getHeight()/2,null);
+            }
+            else if(levelLoader.getLevel() == 2){
+                g.setColor(new Color(178,252,253));
+                g.fillRect(0,0, MiniMap.X, HEIGHT);
+                g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
+                g.drawImage(icyMountains,0,0, icyMountains.getWidth(),icyMountains.getHeight(),null);
+            }
+            else if(levelLoader.getLevel() == 3){
+                g.setColor(new Color(91,127,0));
+                g.fillRect(0,0, MiniMap.X, HEIGHT);
+                g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
+                g.drawImage(rainy,50,50, rainy.getWidth(),rainy.getHeight(),null);
+            }
+
+
+            g.translate((int)cam.getX(), (int)cam.getY());
+            handler.draw(g);
+            g.translate((int)cam.getX() * -1, (int)cam.getY() * -1);
+
+            hud.draw(g);
+
         }
-        else if(levelLoader.getLevel() == 2){
-            g.setColor(new Color(178,252,253));
-            g.fillRect(0,0, MiniMap.X, HEIGHT);
-            g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
-            g.drawImage(icyMountains,0,0, icyMountains.getWidth(),icyMountains.getHeight(),null);
+        // if it is paused then run through the menu
+        else{
+            g.setColor(Color.CYAN);
+            g.fillRect(0,0,WIDTH,HEIGHT);
+            menu.draw(g);
         }
-        else if(levelLoader.getLevel() == 3){
-            g.setColor(new Color(91,127,0));
-            g.fillRect(0,0, MiniMap.X, HEIGHT);
-            g.fillRect(MiniMap.X,MiniMap.HEIGHT,WIDTH - MiniMap.WIDTH,HEIGHT-MiniMap.HEIGHT);
-            g.drawImage(rainy,50,50, rainy.getWidth(),rainy.getHeight(),null);
-        }
-
-
-        g.translate((int)cam.getX(), (int)cam.getY());
-        handler.draw(g);
-        g.translate((int)cam.getX() * -1, (int)cam.getY() * -1);
-
-        hud.draw(g);
         g.dispose();
         bs.show();
     }
 
     public static Images getImages(){
         return images;
+    }
+
+    public void setPaused(boolean paused){
+        this.paused = paused;
+    }
+    public boolean isPaused(){
+        return paused;
     }
 
     public static void main(String args[]){

@@ -9,7 +9,11 @@ import main.objects.Player;
 
 import java.awt.*;
 
-
+/*
+    For my future reference
+    To improve the HUD and Menu make the any player method that is needed in HUD to be static
+    so it can prevent bugs
+ */
 public class HUD {
 
     private Controller handler;
@@ -25,7 +29,7 @@ public class HUD {
         findPlayer();
     }
 
-    private void findPlayer(){
+    public void findPlayer(){
         for(int i = 0; i < handler.getHandler().size(); i++){
             if(handler.getHandler().get(i).getId().equals(ObjectID.Player)){
                 p = (Player) handler.getHandler().get(i);
@@ -44,7 +48,13 @@ public class HUD {
             g.setColor(Color.BLACK);
             g.drawString("Game Over!!", GameWorld.WIDTH/8 * 3, GameWorld.HEIGHT/4);
             g.setFont(new Font("arial",1,18));
-            g.drawString("Player score: " + scoreP1, GameWorld.WIDTH/4, GameWorld.HEIGHT/2);
+            g.drawString("Player score: " + scoreP1, GameWorld.WIDTH/8 * 3 + 30, GameWorld.HEIGHT/2);
+            Font fnt2 = new Font("arial", 1, 30);
+            g.setFont(fnt2);
+            g.drawRect(20,GameWorld.HEIGHT - 140,200,64);
+            g.drawString("Retry",70,GameWorld.HEIGHT - 100);
+            g.drawRect(400,GameWorld.HEIGHT - 140,200,64);
+            g.drawString("Quit",470,GameWorld.HEIGHT - 100);
         }
         else {
             // displaying revives left
