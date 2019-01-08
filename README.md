@@ -8,9 +8,9 @@ Also the game may crash sometimes because of a thread exception but it rarely ha
 
 The controls for my game is:
 Player: 
-P -> Pause
-W -> Jump
-A -> Left
-D -> Right
-Space -> Shoot
+P -> Pause,
+W -> Jump,
+A -> Left,
+D -> Right,
+Space -> Shoot,
 ESC -> Quit
